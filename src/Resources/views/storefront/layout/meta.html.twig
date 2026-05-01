@@ -3,7 +3,7 @@
 {% block layout_head_meta_tags %}
     {{ parent() }}
 
-    {% if not config('TinectMatomo.config.activateProxyTracking') %}
+    {% if (config('TinectMatomo.config.trackingMode') ?: 'client') == 'client' %}
         <link rel="preconnect" crossorigin href="{{ config("TinectMatomo.config.matomoserver") }}">
     {% endif %}
 {% endblock %}

@@ -27,7 +27,33 @@
         </input-field>
     </card>
     <card>
-        <title>Fight Adblockers and Server-Side tracking</title>
+        <title>Tracking mode</title>
+        <title lang="de-DE">Tracking-Modus</title>
+        <input-field type="single-select">
+            <name>trackingMode</name>
+            <label>Tracking mode</label>
+            <label lang="de-DE">Tracking-Modus</label>
+            <defaultValue>client</defaultValue>
+            <options>
+                <option>
+                    <id>client</id>
+                    <name>Client-side (browser JavaScript)</name>
+                    <name lang="de-DE">Clientseitig (Browser-JavaScript)</name>
+                </option>
+                <option>
+                    <id>proxy</id>
+                    <name>Proxy (browser via shop, async forwarding)</name>
+                    <name lang="de-DE">Proxy (Browser über Shop, asynchrone Weiterleitung)</name>
+                </option>
+                <option>
+                    <id>server</id>
+                    <name>Server-side (PHP events, no browser JavaScript)</name>
+                    <name lang="de-DE">Serverseitig (PHP-Events, kein Browser-JavaScript)</name>
+                </option>
+            </options>
+            <helpText>Client: Matomo JS in the browser. Proxy: browser sends to the shop, shop forwards to Matomo. Server: events are tracked from PHP without any browser JavaScript - resistant to adblockers and JavaScript blockers.</helpText>
+            <helpText lang="de-DE">Client: Matomo-JS im Browser. Proxy: Browser sendet an den Shop, der Shop leitet an Matomo weiter. Server: Events werden direkt aus PHP getrackt, ohne Browser-JavaScript - resistent gegen Adblocker und JavaScript-Blocker.</helpText>
+        </input-field>
         <input-field>
             <name>phpTrackingPath</name>
             <label>Optional path to matomo.php (recommended)</label>
@@ -46,19 +72,36 @@
             <helpText>Because of adblockers, you should use a non-default path to the file. Add rewriteRule in your Server setting which points to matomo.js.</helpText>
             <helpText lang="de-DE">Aufgrund von Adblockers sollten Sie einen nicht standardmäßigen Pfad zu der Datei verwenden. Fügen Sie rewriteRule in Ihrer Servereinstellung hinzu, die auf matomo.js verweist.</helpText>
         </input-field>
-        <input-field type="bool">
-            <name>activateProxyTracking</name>
-            <label>Activate ProxyTracking/Server-Side tracking</label>
-            <label lang="de-DE">Aktiviere ProxyTracking/Serverside Tracking</label>
-            <defaultValue>0</defaultValue>
-            <helpText>When having Matomo on a different domain, adblockers could block the tracking. This options routes all trackings through the shop.</helpText>
-            <helpText lang="de-DE">Wenn Sie Matomo auf einer anderen Domain haben, könnten Adblocker das Tracking blockieren. Diese Option leitet alle Trackings durch den Shop.</helpText>
-        </input-field>
         <input-field>
             <name>matomoauthtoken</name>
             <label>Matomo Auth-Token</label>
-            <helpText>The Auth-Token of a user with admin-rights. Necessary, when ProxyTracking is activated.</helpText>
-            <helpText lang="de-DE">Der Auth-Token eines Benutzers mit administrativen Rechten. Notwendig, wenn ProxyTracking aktiviert ist.</helpText>
+            <helpText>The Auth-Token of a user with admin-rights. Required for proxy and server-side tracking modes.</helpText>
+            <helpText lang="de-DE">Der Auth-Token eines Benutzers mit administrativen Rechten. Erforderlich für die Tracking-Modi Proxy und Server.</helpText>
+        </input-field>
+    </card>
+    <card>
+        <title>Server-side tracking goals</title>
+        <title lang="de-DE">Server-Side-Tracking-Ziele</title>
+        <input-field type="int">
+            <name>goalIdRegister</name>
+            <label>Matomo Goal ID for customer registration</label>
+            <label lang="de-DE">Matomo-Ziel-ID für Kundenregistrierung</label>
+            <helpText>Optional. Enter the Matomo goal ID that should be triggered when a new customer registers.</helpText>
+            <helpText lang="de-DE">Optional. ID des Matomo-Ziels, das bei einer Neuregistrierung ausgelöst werden soll.</helpText>
+        </input-field>
+        <input-field type="int">
+            <name>goalIdCartView</name>
+            <label>Matomo Goal ID for cart view</label>
+            <label lang="de-DE">Matomo-Ziel-ID für Warenkorb-Ansicht</label>
+            <helpText>Optional. Triggered when the cart page is shown.</helpText>
+            <helpText lang="de-DE">Optional. Wird ausgelöst, wenn die Warenkorbseite angezeigt wird.</helpText>
+        </input-field>
+        <input-field type="int">
+            <name>goalIdCheckoutConfirm</name>
+            <label>Matomo Goal ID for checkout confirmation</label>
+            <label lang="de-DE">Matomo-Ziel-ID für Checkout-Bestätigung</label>
+            <helpText>Optional. Triggered when the checkout confirm page is shown.</helpText>
+            <helpText lang="de-DE">Optional. Wird ausgelöst, wenn die Bestätigungsseite des Checkouts angezeigt wird.</helpText>
         </input-field>
     </card>
 </config>

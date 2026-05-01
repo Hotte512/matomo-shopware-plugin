@@ -29,5 +29,74 @@
             <argument type="service" id="Tinect\Matomo\Service\ConditionalLogger"/>
             <tag name="messenger.message_handler" />
         </service>
+
+        <service id="Tinect\Matomo\Tracking\VisitorIdResolver">
+            <argument>%kernel.secret%</argument>
+            <argument type="service" id="request_stack"/>
+        </service>
+
+        <service id="Tinect\Matomo\Tracking\TrackingPayloadBuilder">
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
+        </service>
+
+        <service id="Tinect\Matomo\Tracking\ServerSideTracker">
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
+            <argument type="service" id="request_stack"/>
+            <argument type="service" id="messenger.bus.default"/>
+            <argument type="service" id="Tinect\Matomo\Service\ConditionalLogger"/>
+        </service>
+
+        <service id="Tinect\Matomo\Subscriber\PageViewSubscriber">
+            <argument type="service" id="Tinect\Matomo\Tracking\ServerSideTracker"/>
+            <argument type="service" id="Tinect\Matomo\Tracking\TrackingPayloadBuilder"/>
+            <argument type="service" id="Tinect\Matomo\Tracking\VisitorIdResolver"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Tinect\Matomo\Subscriber\ProductViewSubscriber">
+            <argument type="service" id="Tinect\Matomo\Tracking\ServerSideTracker"/>
+            <argument type="service" id="Tinect\Matomo\Tracking\TrackingPayloadBuilder"/>
+            <argument type="service" id="Tinect\Matomo\Tracking\VisitorIdResolver"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Tinect\Matomo\Subscriber\SiteSearchSubscriber">
+            <argument type="service" id="Tinect\Matomo\Tracking\ServerSideTracker"/>
+            <argument type="service" id="Tinect\Matomo\Tracking\TrackingPayloadBuilder"/>
+            <argument type="service" id="Tinect\Matomo\Tracking\VisitorIdResolver"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Tinect\Matomo\Subscriber\CheckoutFunnelSubscriber">
+            <argument type="service" id="Tinect\Matomo\Tracking\ServerSideTracker"/>
+            <argument type="service" id="Tinect\Matomo\Tracking\TrackingPayloadBuilder"/>
+            <argument type="service" id="Tinect\Matomo\Tracking\VisitorIdResolver"/>
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Tinect\Matomo\Subscriber\OrderSubscriber">
+            <argument type="service" id="Tinect\Matomo\Tracking\ServerSideTracker"/>
+            <argument type="service" id="Tinect\Matomo\Tracking\TrackingPayloadBuilder"/>
+            <argument type="service" id="Tinect\Matomo\Tracking\VisitorIdResolver"/>
+            <argument type="service" id="request_stack"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Tinect\Matomo\Subscriber\CartSubscriber">
+            <argument type="service" id="Tinect\Matomo\Tracking\ServerSideTracker"/>
+            <argument type="service" id="Tinect\Matomo\Tracking\TrackingPayloadBuilder"/>
+            <argument type="service" id="Tinect\Matomo\Tracking\VisitorIdResolver"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
+
+        <service id="Tinect\Matomo\Subscriber\CustomerSubscriber">
+            <argument type="service" id="Tinect\Matomo\Tracking\ServerSideTracker"/>
+            <argument type="service" id="Tinect\Matomo\Tracking\TrackingPayloadBuilder"/>
+            <argument type="service" id="Tinect\Matomo\Tracking\VisitorIdResolver"/>
+            <argument type="service" id="Shopware\Core\System\SystemConfig\SystemConfigService"/>
+            <argument type="service" id="request_stack"/>
+            <tag name="kernel.event_subscriber"/>
+        </service>
     </services>
 </container>

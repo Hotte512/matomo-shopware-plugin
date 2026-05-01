@@ -1,0 +1,89 @@
+<?php declare(strict_types=1);
+
+namespace Tinect\Matomo\Tracking;
+
+use Shopware\Core\System\SystemConfig\SystemConfigService;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Messenger\MessageBusInterface;
+use Tinect\Matomo\MessageQueue\TrackMessage;
+use Tinect\Matomo\Service\ConditionalLogger;
+
+class ServerSideTracker
+{
+    public const MODE_CLIENT = 'client';
+    public const MODE_PROXY = 'proxy';
+    public const MODE_SERVER = 'server';
+
+    public function __construct(
+        private readonly SystemConfigService $systemConfigService,
+        private readonly RequestStack $requestStack,
+        private readonly MessageBusInterface $messageBus,
+        private readonly ConditionalLogger $logger
+    ) {
+    }
+
+    public function isServerMode(): bool
+    {
+        return $this->getMode() === self::MODE_SERVER;
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    public function track(array $payload): void
+    {
+        if (!$this->isServerMode()) {
+            return;
+        }
+
+        if ($this->systemConfigService->getString('TinectMatomo.config.matomoserver') === '') {
+            return;
+        }
+
+        $request = $this->requestStack->getMainRequest();
+
+        $clientIp = $request?->getClientIp();
+        $userAgent = $request?->headers->get('User-Agent', '') ?? '';
+        $acceptLanguage = $request?->headers->get('Accept-Language', '') ?? '';
+        $referer = $request?->headers->get('Referer');
+
+        if ($referer !== null && !isset($payload['urlref'])) {
+            $payload['urlref'] = $referer;
+        }
+
+        if ($request !== null && !isset($payload['url'])) {
+            $payload['url'] = $this->buildUrl($request);
+        }
+
+        try {
+            $this->messageBus->dispatch(new TrackMessage(
+                $clientIp,
+                $userAgent,
+                $acceptLanguage,
+                time(),
+                $payload
+            ));
+        } catch (\Throwable $e) {
+            $this->logger->error('Failed to dispatch Matomo server-side tracking message.', [
+                'exception' => $e::class,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function getMode(): string
+    {
+        $mode = $this->systemConfigService->getString('TinectMatomo.config.trackingMode');
+
+        return match ($mode) {
+            self::MODE_PROXY, self::MODE_SERVER => $mode,
+            default => self::MODE_CLIENT,
+        };
+    }
+
+    private function buildUrl(Request $request): string
+    {
+        return $request->getSchemeAndHttpHost() . $request->getRequestUri();
+    }
+}
