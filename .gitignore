@@ -1,2 +1,4 @@
 storefront/dist/*
 .idea
+/vendor/
+/composer.lock
