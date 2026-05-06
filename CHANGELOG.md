@@ -43,6 +43,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   JavaScript is emitted.
 - The `<link rel="preconnect">` to the Matomo server is only emitted in
   `client` mode (proxy, hybrid and server modes do not need it).
+- README rewritten to document tracking modes, configuration fields,
+  the asynchronous worker requirement, Matomo-side prerequisites,
+  privacy considerations, verification steps and troubleshooting.
 
 ## [6.1.0] - 2025
 
