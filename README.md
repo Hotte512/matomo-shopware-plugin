@@ -103,15 +103,90 @@ In production run the worker permanently via Supervisor or a systemd
 unit. If tracking suddenly stops, check the queue first
 (`bin/console messenger:failed:show`).
 
-## Matomo-side requirements
+## Matomo-side setup
 
-* The configured **auth token** must belong to a user with at least
-  *admin* rights on the site, otherwise Matomo ignores `cip` (client
-  IP) and `cdt` (custom datetime).
-* **Enable e-commerce** for the Matomo site (Settings → Websites →
-  e-commerce) so that `ec_id`, `revenue`, `ec_items` etc. are stored.
-* If you want to use the goal-ID settings, **create the goals in
-  Matomo first** and copy the numeric IDs into the plugin configuration.
+The plugin configuration references several values from your Matomo
+instance. Here is where to find each one and what the Matomo side
+needs to fulfill for tracking to work end-to-end.
+
+### Site-ID
+
+Each tracked website has a numeric ID assigned by Matomo. Find it
+under **Administration → Websites → Manage** - the **ID** column
+shows the value. Alternatively, the `idSite=X` query parameter in any
+reporting URL is the site ID of the currently selected site. Put this
+number into the plugin's **Matomo Site-ID** field.
+
+### Auth-Token
+
+The plugin sends this token as `token_auth` with every server-to-server
+tracking request. Matomo only accepts the real visitor IP (`cip`) and
+the original event time (`cdt`) when the request is authenticated -
+without an authenticated request every visitor would appear under your
+shop server's IP and the live-view timestamp would shift to whenever
+the queue worker happened to process the event.
+
+Required for the `proxy`, `hybrid` and `server` tracking modes; not
+used in `client` mode.
+
+How to create one:
+
+1. Log into Matomo as a user with **at least admin rights on the
+   site** you track. A dedicated user (e.g. `shopware-tracking`) is
+   recommended so you can rotate the token without affecting other
+   logins.
+2. Click your **username (top right) → Personal → Security**
+   (URL path: `/index.php?module=UsersManager&action=userSecurity`).
+3. In the **Auth tokens** section choose **Create new token**, give
+   it a description, confirm with your Matomo password.
+4. Matomo shows the 32-character token **once**. Copy it immediately
+   into the plugin's **Matomo Auth-Token** field.
+
+Rotation: delete the old token in the same view, create a new one,
+update the plugin field afterwards - tracking pauses until the new
+value is saved.
+
+If the token belongs to a user with insufficient rights, Matomo
+silently drops `cip` and `cdt`. Symptom: every visitor shows the shop
+server's IP and the live-view timestamps lag behind the real action.
+Switch to an admin-level token to fix it. With the plugin's debug
+logger enabled, HTTP 4xx errors from Matomo are written to
+`var/log/tinect_matomo*.log`.
+
+### Goal IDs
+
+Goal IDs map server-side events (customer registration, cart view,
+checkout confirm) to Matomo goals so they appear in the conversion
+reports. They are optional - leaving a goal-ID field empty just
+skips the goal conversion for that event; the underlying server-side
+event (page view / custom event) is still tracked.
+
+To find or create them:
+
+1. In Matomo switch to the site whose ID you configured in the plugin.
+2. **Administration → Websites → Goals**
+   (URL path: `/index.php?module=Goals&action=manage&idSite=X`, with
+   `X` = your Site-ID).
+3. The list shows each goal with its **ID** in the first column. Put
+   that number into the corresponding plugin field
+   (`goalIdRegister` / `goalIdCartView` / `goalIdCheckoutConfirm`).
+
+If the goals do not exist yet, create them in the same view via
+**Add a new goal**. Choose **manually** as the trigger - the plugin
+fires the goal explicitly through the tracking API, no Matomo-side URL
+matching is needed. Pick a meaningful name (e.g. *Customer
+registration*, *Cart viewed*, *Checkout reached*) and, if relevant, a
+default revenue. Save, then copy the new goal ID back into the plugin
+configuration.
+
+### E-commerce
+
+For order tracking (`ec_id`, `revenue`, `ec_items`) to be stored,
+**enable e-commerce** on the site:
+**Administration → Websites → Manage → (your site) → e-commerce**.
+Without this Matomo accepts the request but discards the e-commerce
+fields, leaving you with a page view but no order in the conversion
+reports.
 
 ## Privacy and consent
 

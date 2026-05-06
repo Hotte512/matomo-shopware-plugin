@@ -56,6 +56,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - README rewritten to document tracking modes, configuration fields,
   the asynchronous worker requirement, Matomo-side prerequisites,
   privacy considerations, verification steps and troubleshooting.
+- README "Matomo-side setup" section expanded with step-by-step
+  instructions for finding Site-ID, creating an auth token, and
+  finding or creating goal IDs in the Matomo backend, including the
+  exact admin paths and the consequences of misconfigured values.
 
 ## [6.1.0] - 2025
 
