@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+- Proxy route `/mtmtrpr` now validates that the incoming `idsite` matches
+  the configured Matomo site and rejects mismatched, missing or
+  malformed payloads with HTTP 400. Previously the proxy attached the
+  configured admin `token_auth` to any attacker-supplied tracking
+  payload, which allowed an unauthenticated remote caller to forge
+  analytics data (page views, goals, e-commerce orders, IP/timestamp
+  overrides, geo overrides, visitor-id forcing) on any Matomo site
+  reachable by that token - including sites belonging to other tenants
+  on a shared Matomo instance.
+- Strip auth-only parameters (`token_auth`, `cip`, `cdt`, `cdo`,
+  `country`, `region`, `city`, `lat`, `long`, `cid`, `ua`, `lang`) from
+  incoming proxy payloads before forwarding; the server re-attaches its
+  own authoritative `cdt`, `cip` and `token_auth`. The validation
+  applies to GET query strings, form-urlencoded POST bodies and the
+  Matomo bulk-tracking JSON format (`{"requests": [...]}`); a single
+  bad entry rejects the entire bulk payload.
+
 ### Added
 - Real server-side tracking mode (`server`): page views, product views,
   site search, cart add/remove, checkout funnel goals, orders, customer
