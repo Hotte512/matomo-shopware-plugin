@@ -26,7 +26,7 @@ class SiteSearchSubscriber implements EventSubscriberInterface
 
     public function onSearch(SearchPageLoadedEvent $event): void
     {
-        if (!$this->tracker->isServerMode()) {
+        if (!$this->tracker->isServerOrHybridMode()) {
             return;
         }
 

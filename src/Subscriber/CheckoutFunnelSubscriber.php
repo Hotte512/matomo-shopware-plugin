@@ -30,7 +30,7 @@ class CheckoutFunnelSubscriber implements EventSubscriberInterface
 
     public function onCart(CheckoutCartPageLoadedEvent $event): void
     {
-        if (!$this->tracker->isServerMode()) {
+        if (!$this->tracker->isServerOrHybridMode()) {
             return;
         }
 
@@ -58,7 +58,7 @@ class CheckoutFunnelSubscriber implements EventSubscriberInterface
 
     public function onConfirm(CheckoutConfirmPageLoadedEvent $event): void
     {
-        if (!$this->tracker->isServerMode()) {
+        if (!$this->tracker->isServerOrHybridMode()) {
             return;
         }
 

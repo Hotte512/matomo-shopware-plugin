@@ -26,7 +26,7 @@ class ProductViewSubscriber implements EventSubscriberInterface
 
     public function onProductPage(ProductPageLoadedEvent $event): void
     {
-        if (!$this->tracker->isServerMode()) {
+        if (!$this->tracker->isServerOrHybridMode()) {
             return;
         }
 

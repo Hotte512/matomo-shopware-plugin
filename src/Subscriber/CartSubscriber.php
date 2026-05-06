@@ -40,7 +40,7 @@ class CartSubscriber implements EventSubscriberInterface
 
     private function trackCartEvent(string $action, LineItem $lineItem, SalesChannelContext $context): void
     {
-        if (!$this->tracker->isServerMode()) {
+        if (!$this->tracker->isServerOrHybridMode()) {
             return;
         }
 

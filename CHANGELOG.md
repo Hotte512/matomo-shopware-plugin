@@ -13,12 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   registration and login are tracked from PHP via the existing async
   Symfony Messenger pipeline. Resistant to ad-blockers and missing
   JavaScript.
-- Hybrid tracking mode (`hybrid`): keeps the JavaScript tracker for full
-  engagement metrics (heartbeat / time-on-page, link tracking) and adds
-  redundant server-side tracking for orders (deduplicated by Matomo via
-  `ec_id`), customer registration and customer login. Intended setup
-  for shops that want JavaScript-grade engagement data and ad-blocker-
-  resistant business events at the same time.
+- Hybrid tracking mode (`hybrid`): every event is tracked server-side,
+  the browser only emits Matomo `ping=1` heartbeats so that
+  time-on-page / engagement metrics are attached to the existing
+  server-tracked page view via a shared cookieless visitor ID. The
+  full Matomo tracker JS is intentionally not loaded - this way
+  adblockers cannot strip page views, products, cart actions or
+  orders. Heartbeats go through the `/mtmtrpr` proxy route.
+- Twig function `tinect_matomo_visitor_id()` exposing the cookieless
+  visitor ID hash to templates (used by hybrid mode to share the
+  visitor ID between server-side events and JavaScript heartbeats).
 - New configuration option `trackingMode` (single-select: `client` /
   `proxy` / `hybrid` / `server`) replaces the boolean
   `activateProxyTracking`. Existing installations are migrated on plugin

@@ -5,7 +5,9 @@
 
     {% block tinect_matomo_script %}
         {% set tinectMatomoMode = config('TinectMatomo.config.trackingMode') ?: 'client' %}
-        {% if tinectMatomoMode in ['client', 'proxy', 'hybrid'] %}
+        {% set matomoServer = config('TinectMatomo.config.matomoserver') %}
+
+        {% if tinectMatomoMode in ['client', 'proxy'] and matomoServer %}
             <script>
                 window._paq = window._paq || [];
 
@@ -73,26 +75,87 @@
                     window._paq.push(['enableLinkTracking']);
                 }
 
-                {% set matomoServer = config('TinectMatomo.config.matomoserver') %}
-                {% if matomoServer %}
-                    {% if tinectMatomoMode in ['proxy', 'hybrid'] %}
-                        {% set trackerUrl = seoUrl('frontend.matomo.proxy') %}
-                        {% set trackerJsSrc = seoUrl('frontend.matomo.js') %}
-                    {% else %}
-                        {% set trackerUrl = matomoServer ~ '/' ~ (config('TinectMatomo.config.phpTrackingPath') ?: 'matomo.php') %}
-                        {% set trackerJsSrc = matomoServer ~ '/' ~ (config('TinectMatomo.config.jsTrackingPath') ?: 'matomo.js') %}
-                    {% endif %}
-
-                    window._paq.push(['setTrackerUrl', '{{ trackerUrl }}']);
-                    window._paq.push(['setSiteId', '{{ config('TinectMatomo.config.matomosite') }}']);
-                    (function () {
-                        const d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
-                        g.type = 'text/javascript';
-                        g.async = true;
-                        g.src = '{{ trackerJsSrc }}';
-                        s.parentNode.insertBefore(g, s);
-                    })();
+                {% if tinectMatomoMode == 'proxy' %}
+                    {% set trackerUrl = seoUrl('frontend.matomo.proxy') %}
+                    {% set trackerJsSrc = seoUrl('frontend.matomo.js') %}
+                {% else %}
+                    {% set trackerUrl = matomoServer ~ '/' ~ (config('TinectMatomo.config.phpTrackingPath') ?: 'matomo.php') %}
+                    {% set trackerJsSrc = matomoServer ~ '/' ~ (config('TinectMatomo.config.jsTrackingPath') ?: 'matomo.js') %}
                 {% endif %}
+
+                window._paq.push(['setTrackerUrl', '{{ trackerUrl }}']);
+                window._paq.push(['setSiteId', '{{ config('TinectMatomo.config.matomosite') }}']);
+                (function () {
+                    const d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+                    g.type = 'text/javascript';
+                    g.async = true;
+                    g.src = '{{ trackerJsSrc }}';
+                    s.parentNode.insertBefore(g, s);
+                })();
+            </script>
+        {% elseif tinectMatomoMode == 'hybrid' and matomoServer %}
+            {#
+              Hybrid mode: server-side subscribers track every event (page views,
+              products, cart, search, checkout funnel, orders, register, login).
+              The browser only sends Matomo `ping=1` heartbeats so that
+              time-on-page / engagement metrics are attached to the existing
+              server-tracked page view via the shared visitor id.
+              The full Matomo tracker JS is intentionally NOT loaded.
+            #}
+            <script>
+                (function () {
+                    var trackerUrl = '{{ seoUrl('frontend.matomo.proxy') }}';
+                    var idsite = '{{ config('TinectMatomo.config.matomosite')|escape('js') }}';
+                    var visitorId = '{{ tinect_matomo_visitor_id()|escape('js') }}';
+                    if (!trackerUrl || !idsite || !visitorId) {
+                        return;
+                    }
+
+                    var pageUrl = window.location.href;
+                    var heartbeatIntervalMs = 15000;
+                    var idleThresholdMs = 30000;
+                    var lastActivity = Date.now();
+                    var pageVisible = !document.hidden;
+
+                    var bumpActivity = function () { lastActivity = Date.now(); };
+                    ['mousemove', 'keydown', 'scroll', 'click', 'touchstart'].forEach(function (evt) {
+                        document.addEventListener(evt, bumpActivity, { passive: true });
+                    });
+                    document.addEventListener('visibilitychange', function () {
+                        pageVisible = !document.hidden;
+                        if (pageVisible) {
+                            bumpActivity();
+                        }
+                    });
+
+                    var ping = function (force) {
+                        if (!force && (!pageVisible || Date.now() - lastActivity > idleThresholdMs)) {
+                            return;
+                        }
+
+                        var body = new URLSearchParams();
+                        body.set('idsite', idsite);
+                        body.set('rec', '1');
+                        body.set('ping', '1');
+                        body.set('url', pageUrl);
+                        body.set('_id', visitorId);
+                        body.set('cdt', String(Math.floor(Date.now() / 1000)));
+
+                        if (typeof navigator.sendBeacon === 'function') {
+                            navigator.sendBeacon(trackerUrl, body);
+                        } else {
+                            fetch(trackerUrl, {
+                                method: 'POST',
+                                body: body,
+                                keepalive: true,
+                                credentials: 'same-origin',
+                            }).catch(function () {});
+                        }
+                    };
+
+                    setInterval(ping, heartbeatIntervalMs);
+                    window.addEventListener('pagehide', function () { ping(true); });
+                })();
             </script>
         {% endif %}
     {% endblock %}

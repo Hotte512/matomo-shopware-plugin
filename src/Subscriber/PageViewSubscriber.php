@@ -31,7 +31,7 @@ class PageViewSubscriber implements EventSubscriberInterface
 
     public function onPage(PageLoadedEvent $event): void
     {
-        if (!$this->tracker->isServerMode()) {
+        if (!$this->tracker->isServerOrHybridMode()) {
             return;
         }
 

@@ -50,18 +50,21 @@ Open the Shopware administration and navigate to
 
 | Mode | Browser JS | Server tracking | Recommended for |
 | --- | --- | --- | --- |
-| `client` | yes, direct to Matomo | no | Default install, no adblocker concerns |
-| `proxy` | yes, via `/mtmtrpr` | no | Adblocker mitigation, Matomo on a different domain |
-| `hybrid` | yes, via `/mtmtrpr` | orders + register + login | Engagement metrics **and** adblocker-resistant business events (recommended for most shops) |
-| `server` | no | everything | No JavaScript, strict privacy setups |
+| `client` | full Matomo tracker, direct to Matomo | no | Default install, no adblocker concerns |
+| `proxy` | full Matomo tracker, via `/mtmtrpr` | no | Adblocker mitigation, Matomo on a different domain |
+| `hybrid` | heartbeat-only ping, via `/mtmtrpr` | everything | Server-grade reliability **plus** time-on-page / engagement (recommended) |
+| `server` | none | everything | No JavaScript, strict privacy setups |
 
-In `hybrid` mode the JavaScript tracker keeps producing engagement
-metrics (heartbeat / time-on-page, link tracking) while the server
-additionally tracks orders (deduplicated by Matomo via `ec_id`),
-customer registration and customer login - the events most likely to
-be lost to adblockers. Page views, product views, site search, cart
-and checkout funnel events stay client-only in this mode to avoid
-double counting.
+In `hybrid` mode every event (page views, product views, site search,
+cart, checkout funnel, orders, customer registration and login) is
+tracked server-side, exactly like in `server` mode. The browser only
+emits Matomo `ping=1` heartbeats - no `trackPageView`, no Matomo JS
+library is loaded. The pings carry the same cookieless visitor ID hash
+as the server-side events, so Matomo attributes the engagement time to
+the existing page view. This way adblockers cannot strip page views,
+products, cart actions or orders, and time-on-page / engagement still
+gets reported. The heartbeats go through the same `/mtmtrpr` proxy
+route, so they survive standard adblock lists.
 
 In `server` mode no Matomo JavaScript is rendered at all. Visitor IDs
 are derived cookielessly via SHA-256 hashes of the customer ID
