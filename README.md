@@ -4,6 +4,8 @@ This plugin for Shopware 6 connects your shop to the Open Source and self-hostab
 The plugin is based as fork from [tinect/matomo-shopware-plugin](https://github.com/tinect/matomo-shopware-plugin),
 wich is based as fork from [Jinya-CMS/matomo-shopware-plugin](https://github.com/Jinya-CMS/matomo-shopware-plugin).
 
+This Version is Vibe Coded with Claude Code and adds Server Side Tracking with optional hybrid Ping Events.
+
 ## Features
 
 * Four tracking modes: `client`, `proxy`, `hybrid`, `server` (see [Tracking modes](#tracking-modes))
