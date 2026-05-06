@@ -47,8 +47,8 @@
                 </option>
                 <option>
                     <id>hybrid</id>
-                    <name>Hybrid (JS engagement metrics + server-side fallback for orders, register, login)</name>
-                    <name lang="de-DE">Hybrid (JS-Engagement-Metriken + Server-Fallback für Bestellungen, Registrierung, Login)</name>
+                    <name>Hybrid (server-side tracking + JS heartbeat for engagement / time-on-page)</name>
+                    <name lang="de-DE">Hybrid (Server-Tracking + JS-Heartbeat für Engagement / Verweildauer)</name>
                 </option>
                 <option>
                     <id>server</id>
@@ -56,8 +56,8 @@
                     <name lang="de-DE">Serverseitig (PHP-Events, kein Browser-JavaScript)</name>
                 </option>
             </options>
-            <helpText>Client: Matomo JS in the browser. Proxy: browser sends to the shop, shop forwards to Matomo. Hybrid: keeps JS tracking (heartbeat / time-on-page) and adds server-side tracking for orders, registration and login - orders are deduplicated by Matomo via the order number. Server: events are tracked from PHP without any browser JavaScript - resistant to adblockers and JavaScript blockers but no engagement metrics.</helpText>
-            <helpText lang="de-DE">Client: Matomo-JS im Browser. Proxy: Browser sendet an den Shop, der Shop leitet an Matomo weiter. Hybrid: JS-Tracking bleibt aktiv (Heartbeat / Verweildauer) und Bestellungen, Registrierung und Login werden zusätzlich serverseitig getrackt - Bestellungen werden von Matomo über die Bestellnummer dedupliziert. Server: Events werden direkt aus PHP getrackt, ohne Browser-JavaScript - resistent gegen Adblocker und JavaScript-Blocker, aber ohne Engagement-Metriken.</helpText>
+            <helpText>Client: Matomo JS in the browser, talks directly to Matomo. Proxy: browser sends to the shop, shop forwards to Matomo. Hybrid: every event is tracked server-side (orders, page views, products, cart, search, register, login); the browser only sends Matomo ping=1 heartbeats with the same cookieless visitor ID so engagement / time-on-page attaches to the existing server page view - no Matomo JS is loaded. Server: events are tracked from PHP only, no browser JavaScript at all - resistant to adblockers and JavaScript blockers but no engagement metrics.</helpText>
+            <helpText lang="de-DE">Client: Matomo-JS im Browser, spricht direkt mit Matomo. Proxy: Browser sendet an den Shop, der Shop leitet an Matomo weiter. Hybrid: Alle Events werden serverseitig getrackt (Bestellungen, Page Views, Produkte, Warenkorb, Suche, Registrierung, Login); der Browser sendet ausschließlich Matomo-Heartbeat-Pings (ping=1) mit derselben cookielosen Visitor-ID, damit Engagement / Verweildauer am bestehenden Server-Pageview hängt - kein Matomo-JS wird geladen. Server: Events werden ausschließlich aus PHP getrackt, kein Browser-JavaScript - resistent gegen Adblocker und JavaScript-Blocker, aber ohne Engagement-Metriken.</helpText>
         </input-field>
         <input-field>
             <name>phpTrackingPath</name>
@@ -82,6 +82,17 @@
             <label>Matomo Auth-Token</label>
             <helpText>The Auth-Token of a user with admin-rights. Required for proxy and server-side tracking modes.</helpText>
             <helpText lang="de-DE">Der Auth-Token eines Benutzers mit administrativen Rechten. Erforderlich für die Tracking-Modi Proxy und Server.</helpText>
+        </input-field>
+    </card>
+    <card>
+        <title>Hybrid mode</title>
+        <title lang="de-DE">Hybrid-Modus</title>
+        <input-field>
+            <name>hybridHeartbeatUrl</name>
+            <label>Hybrid heartbeat URL (optional)</label>
+            <label lang="de-DE">Hybrid-Heartbeat-URL (optional)</label>
+            <helpText>Only relevant in hybrid mode. URL or absolute path the browser sends Matomo ping=1 heartbeats to. Leave empty to use the built-in /mtmtrpr proxy (default; works for any setup but adds messenger queue load). Set to a same-origin path like /your-matomo-dir/matomo.php (or a renamed path with a server rewrite rule) to send pings directly to Matomo and skip the proxy / queue. Absolute URLs (e.g. https://matomo.example.com/matomo.php) only work if Matomo cors_domains includes the shop origin.</helpText>
+            <helpText lang="de-DE">Nur im Hybrid-Modus relevant. URL oder absoluter Pfad, an den der Browser die Matomo-ping=1-Heartbeats sendet. Leer lassen, um den eingebauten /mtmtrpr-Proxy zu verwenden (Default; funktioniert immer, erzeugt aber Last in der Messenger-Queue). Auf einen same-origin Pfad wie /dein-matomo-verzeichnis/matomo.php setzen (oder einen umbenannten Pfad mit Server-Rewrite-Rule), um Pings direkt an Matomo zu senden und Proxy / Queue zu überspringen. Absolute URLs (z. B. https://matomo.example.com/matomo.php) funktionieren nur, wenn Matomo-cors_domains die Shop-Origin enthält.</helpText>
         </input-field>
     </card>
     <card>

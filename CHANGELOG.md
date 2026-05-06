@@ -23,6 +23,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Twig function `tinect_matomo_visitor_id()` exposing the cookieless
   visitor ID hash to templates (used by hybrid mode to share the
   visitor ID between server-side events and JavaScript heartbeats).
+- New optional setting `hybridHeartbeatUrl`: when set, browser
+  heartbeats in hybrid mode are sent to this URL or path directly
+  (e.g. a same-origin Matomo subdirectory) instead of going through
+  the built-in `/mtmtrpr` proxy and the messenger queue. Empty value
+  keeps the existing proxy behavior, so existing installations are
+  unaffected.
 - New configuration option `trackingMode` (single-select: `client` /
   `proxy` / `hybrid` / `server`) replaces the boolean
   `activateProxyTracking`. Existing installations are migrated on plugin

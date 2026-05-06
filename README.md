@@ -43,6 +43,7 @@ Open the Shopware administration and navigate to
 | Tracking mode | yes | `client` / `proxy` / `hybrid` / `server` |
 | Matomo Auth-Token | for `proxy`, `hybrid`, `server` | Token of a user with at least admin rights on the site |
 | Optional path to matomo.php / matomo.js | optional | Use a non-default path together with a server rewrite rule to bypass adblockers |
+| Hybrid heartbeat URL | optional | Only used in `hybrid` mode. Empty (default) = browser pings go through the built-in `/mtmtrpr` proxy. Set to a same-origin path or full URL to send pings directly to Matomo and skip the proxy / messenger queue. See [Tracking modes](#tracking-modes). |
 | Goal IDs (register / cart view / checkout confirm) | optional | Numeric Matomo goal IDs that should fire on the matching server-side event |
 | Enable Matomo debug logger | optional | Writes detailed tracking requests / responses to `var/log/tinect_matomo*.log` |
 
@@ -63,8 +64,25 @@ library is loaded. The pings carry the same cookieless visitor ID hash
 as the server-side events, so Matomo attributes the engagement time to
 the existing page view. This way adblockers cannot strip page views,
 products, cart actions or orders, and time-on-page / engagement still
-gets reported. The heartbeats go through the same `/mtmtrpr` proxy
-route, so they survive standard adblock lists.
+gets reported.
+
+By default the heartbeats go through the built-in `/mtmtrpr` proxy
+route - same-origin, survives standard adblock lists, but every ping
+is dispatched as a Symfony Messenger message which adds queue load
+(roughly four messages per minute per active visitor). If your Matomo
+is reachable from the browser directly, you can point heartbeats
+straight at it via the **Hybrid heartbeat URL** setting and skip the
+proxy entirely:
+
+| Setup | Recommended Hybrid heartbeat URL |
+| --- | --- |
+| Matomo on the same domain in a subdirectory (e.g. `https://shop.example.com/your-matomo-dir/`) | `/your-matomo-dir/matomo.php` |
+| Same as above with an adblocker-bypass rewrite rule (e.g. `track.php` → `matomo.php`) | `/your-matomo-dir/track.php` |
+| Matomo on a subdomain with CORS allowed for the shop origin | `https://matomo.example.com/matomo.php` |
+| Anything else / unsure | leave empty (= use proxy) |
+
+Server-side tracking is unaffected by this setting: the shop talks to
+Matomo server-to-server via `matomoserver` + `phpTrackingPath` regardless.
 
 In `server` mode no Matomo JavaScript is rendered at all. Visitor IDs
 are derived cookielessly via SHA-256 hashes of the customer ID

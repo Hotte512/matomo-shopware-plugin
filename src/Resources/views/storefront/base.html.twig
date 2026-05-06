@@ -102,9 +102,10 @@
               server-tracked page view via the shared visitor id.
               The full Matomo tracker JS is intentionally NOT loaded.
             #}
+            {% set heartbeatUrl = config('TinectMatomo.config.hybridHeartbeatUrl') ?: seoUrl('frontend.matomo.proxy') %}
             <script>
                 (function () {
-                    var trackerUrl = '{{ seoUrl('frontend.matomo.proxy') }}';
+                    var trackerUrl = '{{ heartbeatUrl|escape('js') }}';
                     var idsite = '{{ config('TinectMatomo.config.matomosite')|escape('js') }}';
                     var visitorId = '{{ tinect_matomo_visitor_id()|escape('js') }}';
                     if (!trackerUrl || !idsite || !visitorId) {
