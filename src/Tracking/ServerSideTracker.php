@@ -13,6 +13,7 @@ class ServerSideTracker
 {
     public const MODE_CLIENT = 'client';
     public const MODE_PROXY = 'proxy';
+    public const MODE_HYBRID = 'hybrid';
     public const MODE_SERVER = 'server';
 
     public function __construct(
@@ -29,11 +30,24 @@ class ServerSideTracker
     }
 
     /**
+     * Returns true for both pure server-side mode and hybrid mode. Used by
+     * subscribers for events that should always be tracked from PHP
+     * (e.g. orders, customer register/login) even when JavaScript tracking
+     * is also active.
+     */
+    public function isServerOrHybridMode(): bool
+    {
+        $mode = $this->getMode();
+
+        return $mode === self::MODE_SERVER || $mode === self::MODE_HYBRID;
+    }
+
+    /**
      * @param array<string, mixed> $payload
      */
     public function track(array $payload): void
     {
-        if (!$this->isServerMode()) {
+        if (!$this->isServerOrHybridMode()) {
             return;
         }
 
@@ -77,7 +91,7 @@ class ServerSideTracker
         $mode = $this->systemConfigService->getString('TinectMatomo.config.trackingMode');
 
         return match ($mode) {
-            self::MODE_PROXY, self::MODE_SERVER => $mode,
+            self::MODE_PROXY, self::MODE_HYBRID, self::MODE_SERVER => $mode,
             default => self::MODE_CLIENT,
         };
     }

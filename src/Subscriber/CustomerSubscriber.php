@@ -32,7 +32,7 @@ class CustomerSubscriber implements EventSubscriberInterface
 
     public function onRegister(CustomerRegisterEvent $event): void
     {
-        if (!$this->tracker->isServerMode()) {
+        if (!$this->tracker->isServerOrHybridMode()) {
             return;
         }
 
@@ -56,7 +56,7 @@ class CustomerSubscriber implements EventSubscriberInterface
 
     public function onLogin(CustomerLoginEvent $event): void
     {
-        if (!$this->tracker->isServerMode()) {
+        if (!$this->tracker->isServerOrHybridMode()) {
             return;
         }
 

@@ -29,7 +29,7 @@ class OrderSubscriber implements EventSubscriberInterface
 
     public function onOrderPlaced(CheckoutOrderPlacedEvent $event): void
     {
-        if (!$this->tracker->isServerMode()) {
+        if (!$this->tracker->isServerOrHybridMode()) {
             return;
         }
 

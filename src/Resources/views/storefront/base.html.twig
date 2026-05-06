@@ -5,7 +5,7 @@
 
     {% block tinect_matomo_script %}
         {% set tinectMatomoMode = config('TinectMatomo.config.trackingMode') ?: 'client' %}
-        {% if tinectMatomoMode in ['client', 'proxy'] %}
+        {% if tinectMatomoMode in ['client', 'proxy', 'hybrid'] %}
             <script>
                 window._paq = window._paq || [];
 
@@ -75,7 +75,7 @@
 
                 {% set matomoServer = config('TinectMatomo.config.matomoserver') %}
                 {% if matomoServer %}
-                    {% if tinectMatomoMode == 'proxy' %}
+                    {% if tinectMatomoMode in ['proxy', 'hybrid'] %}
                         {% set trackerUrl = seoUrl('frontend.matomo.proxy') %}
                         {% set trackerJsSrc = seoUrl('frontend.matomo.js') %}
                     {% else %}

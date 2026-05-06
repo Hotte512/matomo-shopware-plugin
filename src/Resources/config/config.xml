@@ -46,13 +46,18 @@
                     <name lang="de-DE">Proxy (Browser über Shop, asynchrone Weiterleitung)</name>
                 </option>
                 <option>
+                    <id>hybrid</id>
+                    <name>Hybrid (JS engagement metrics + server-side fallback for orders, register, login)</name>
+                    <name lang="de-DE">Hybrid (JS-Engagement-Metriken + Server-Fallback für Bestellungen, Registrierung, Login)</name>
+                </option>
+                <option>
                     <id>server</id>
                     <name>Server-side (PHP events, no browser JavaScript)</name>
                     <name lang="de-DE">Serverseitig (PHP-Events, kein Browser-JavaScript)</name>
                 </option>
             </options>
-            <helpText>Client: Matomo JS in the browser. Proxy: browser sends to the shop, shop forwards to Matomo. Server: events are tracked from PHP without any browser JavaScript - resistant to adblockers and JavaScript blockers.</helpText>
-            <helpText lang="de-DE">Client: Matomo-JS im Browser. Proxy: Browser sendet an den Shop, der Shop leitet an Matomo weiter. Server: Events werden direkt aus PHP getrackt, ohne Browser-JavaScript - resistent gegen Adblocker und JavaScript-Blocker.</helpText>
+            <helpText>Client: Matomo JS in the browser. Proxy: browser sends to the shop, shop forwards to Matomo. Hybrid: keeps JS tracking (heartbeat / time-on-page) and adds server-side tracking for orders, registration and login - orders are deduplicated by Matomo via the order number. Server: events are tracked from PHP without any browser JavaScript - resistant to adblockers and JavaScript blockers but no engagement metrics.</helpText>
+            <helpText lang="de-DE">Client: Matomo-JS im Browser. Proxy: Browser sendet an den Shop, der Shop leitet an Matomo weiter. Hybrid: JS-Tracking bleibt aktiv (Heartbeat / Verweildauer) und Bestellungen, Registrierung und Login werden zusätzlich serverseitig getrackt - Bestellungen werden von Matomo über die Bestellnummer dedupliziert. Server: Events werden direkt aus PHP getrackt, ohne Browser-JavaScript - resistent gegen Adblocker und JavaScript-Blocker, aber ohne Engagement-Metriken.</helpText>
         </input-field>
         <input-field>
             <name>phpTrackingPath</name>
