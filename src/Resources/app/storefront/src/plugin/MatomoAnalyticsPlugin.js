@@ -10,7 +10,9 @@ export default class MatomoAnalyticsPlugin extends window.PluginBaseClass {
             this.handleCookies.bind(this)
         );
 
-        window.mTrackCall();
+        if (typeof window.mTrackCall === 'function') {
+            window.mTrackCall();
+        }
     }
 
     handleCookies(cookieUpdateEvent) {

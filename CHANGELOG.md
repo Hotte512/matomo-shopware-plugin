@@ -47,6 +47,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   on the configured tracking mode and forwards events asynchronously
   through the existing `TrackMessage` / `TrackHandler` pipeline.
 
+### Fixed
+- `MatomoAnalyticsPlugin` (the bundled storefront JS plugin) no longer
+  throws `TypeError: window.mTrackCall is not a function` in `hybrid`
+  and `server` tracking modes. The plugin now checks for the function
+  before calling it; in modes where the inline tracker script is
+  intentionally not rendered the call is skipped, in `client` / `proxy`
+  modes the behavior is unchanged.
+
 ### Changed
 - The Matomo `<script>` block in `base.html.twig` is only rendered for
   `client`, `proxy` and `hybrid` modes; in `server` mode no Matomo
