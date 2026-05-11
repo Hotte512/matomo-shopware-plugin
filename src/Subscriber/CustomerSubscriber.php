@@ -7,6 +7,7 @@ use Shopware\Core\Checkout\Customer\Event\CustomerRegisterEvent;
 use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Tinect\Matomo\Service\StaticHelper;
 use Tinect\Matomo\Tracking\ServerSideTracker;
 use Tinect\Matomo\Tracking\TrackingPayloadBuilder;
 use Tinect\Matomo\Tracking\VisitorIdResolver;
@@ -77,6 +78,6 @@ class CustomerSubscriber implements EventSubscriberInterface
             return '';
         }
 
-        return $request->getSchemeAndHttpHost() . $request->getRequestUri();
+        return StaticHelper::buildStorefrontUrl($request);
     }
 }

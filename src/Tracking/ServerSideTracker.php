@@ -3,11 +3,11 @@
 namespace Tinect\Matomo\Tracking;
 
 use Shopware\Core\System\SystemConfig\SystemConfigService;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Tinect\Matomo\MessageQueue\TrackMessage;
 use Tinect\Matomo\Service\ConditionalLogger;
+use Tinect\Matomo\Service\StaticHelper;
 
 class ServerSideTracker
 {
@@ -67,7 +67,7 @@ class ServerSideTracker
         }
 
         if ($request !== null && !isset($payload['url'])) {
-            $payload['url'] = $this->buildUrl($request);
+            $payload['url'] = StaticHelper::buildStorefrontUrl($request);
         }
 
         try {
@@ -96,8 +96,4 @@ class ServerSideTracker
         };
     }
 
-    private function buildUrl(Request $request): string
-    {
-        return $request->getSchemeAndHttpHost() . $request->getRequestUri();
-    }
 }

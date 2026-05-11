@@ -6,6 +6,7 @@ use Shopware\Core\System\SystemConfig\SystemConfigService;
 use Shopware\Storefront\Page\Checkout\Cart\CheckoutCartPageLoadedEvent;
 use Shopware\Storefront\Page\Checkout\Confirm\CheckoutConfirmPageLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Tinect\Matomo\Service\StaticHelper;
 use Tinect\Matomo\Tracking\ServerSideTracker;
 use Tinect\Matomo\Tracking\TrackingPayloadBuilder;
 use Tinect\Matomo\Tracking\VisitorIdResolver;
@@ -34,8 +35,7 @@ class CheckoutFunnelSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $request = $event->getRequest();
-        $url = $request->getSchemeAndHttpHost() . $request->getRequestUri();
+        $url = StaticHelper::buildStorefrontUrl($event->getRequest());
         $visitorId = $this->visitorIdResolver->resolve($event->getSalesChannelContext());
         $cart = $event->getPage()->getCart();
 
@@ -62,8 +62,7 @@ class CheckoutFunnelSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $request = $event->getRequest();
-        $url = $request->getSchemeAndHttpHost() . $request->getRequestUri();
+        $url = StaticHelper::buildStorefrontUrl($event->getRequest());
         $visitorId = $this->visitorIdResolver->resolve($event->getSalesChannelContext());
 
         $this->tracker->track($this->payloadBuilder->pageView(

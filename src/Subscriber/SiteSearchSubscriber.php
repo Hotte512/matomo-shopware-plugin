@@ -4,6 +4,7 @@ namespace Tinect\Matomo\Subscriber;
 
 use Shopware\Storefront\Page\Search\SearchPageLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Tinect\Matomo\Service\StaticHelper;
 use Tinect\Matomo\Tracking\ServerSideTracker;
 use Tinect\Matomo\Tracking\TrackingPayloadBuilder;
 use Tinect\Matomo\Tracking\VisitorIdResolver;
@@ -31,8 +32,7 @@ class SiteSearchSubscriber implements EventSubscriberInterface
         }
 
         $page = $event->getPage();
-        $request = $event->getRequest();
-        $url = $request->getSchemeAndHttpHost() . $request->getRequestUri();
+        $url = StaticHelper::buildStorefrontUrl($event->getRequest());
 
         $keyword = (string) $page->getSearchTerm();
         if ($keyword === '') {

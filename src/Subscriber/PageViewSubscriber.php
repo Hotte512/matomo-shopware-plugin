@@ -7,6 +7,7 @@ use Shopware\Storefront\Page\Account\Overview\AccountOverviewPageLoadedEvent;
 use Shopware\Storefront\Page\Navigation\NavigationPageLoadedEvent;
 use Shopware\Storefront\Page\PageLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Tinect\Matomo\Service\StaticHelper;
 use Tinect\Matomo\Tracking\ServerSideTracker;
 use Tinect\Matomo\Tracking\TrackingPayloadBuilder;
 use Tinect\Matomo\Tracking\VisitorIdResolver;
@@ -36,7 +37,7 @@ class PageViewSubscriber implements EventSubscriberInterface
         }
 
         $request = $event->getRequest();
-        $url = $request->getSchemeAndHttpHost() . $request->getRequestUri();
+        $url = StaticHelper::buildStorefrontUrl($request);
         $route = $request->attributes->get('_route');
         $actionName = $this->resolveActionName($event, \is_string($route) ? $route : null);
 

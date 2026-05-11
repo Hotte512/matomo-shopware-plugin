@@ -4,6 +4,7 @@ namespace Tinect\Matomo\Subscriber;
 
 use Shopware\Storefront\Page\Product\ProductPageLoadedEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Tinect\Matomo\Service\StaticHelper;
 use Tinect\Matomo\Tracking\ServerSideTracker;
 use Tinect\Matomo\Tracking\TrackingPayloadBuilder;
 use Tinect\Matomo\Tracking\VisitorIdResolver;
@@ -31,8 +32,7 @@ class ProductViewSubscriber implements EventSubscriberInterface
         }
 
         $product = $event->getPage()->getProduct();
-        $request = $event->getRequest();
-        $url = $request->getSchemeAndHttpHost() . $request->getRequestUri();
+        $url = StaticHelper::buildStorefrontUrl($event->getRequest());
 
         $productName = $this->resolveProductName($product->getTranslation('name'), $product->getName());
         $sku = $product->getProductNumber();

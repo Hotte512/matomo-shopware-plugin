@@ -48,6 +48,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   through the existing `TrackMessage` / `TrackHandler` pipeline.
 
 ### Fixed
+- Server-side tracked URLs are now the customer-facing SEO URLs
+  (e.g. `/sandkasten-paula-fichte`) instead of the internal
+  `/detail/{id}` form. Shopware's `RequestTransformer` rewrites the
+  request URI to the technical route before the page-loaded events
+  fire; the new `StaticHelper::buildStorefrontUrl()` reads the
+  preserved `RequestTransformer::ORIGINAL_REQUEST_URI` and
+  `SALES_CHANNEL_ABSOLUTE_BASE_URL` request attributes (with a
+  graceful fallback to `Request::getRequestUri()` /
+  `getSchemeAndHttpHost()`) and is used by every subscriber and the
+  `ServerSideTracker` fallback so Matomo records the human-readable
+  URL.
 - `MatomoAnalyticsPlugin` (the bundled storefront JS plugin) no longer
   throws `TypeError: window.mTrackCall is not a function` in `hybrid`
   and `server` tracking modes. The plugin now checks for the function

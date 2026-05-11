@@ -3,6 +3,8 @@
 namespace Tinect\Matomo\Service;
 
 use Shopware\Core\System\SystemConfig\SystemConfigService;
+use Shopware\Storefront\Framework\Routing\RequestTransformer;
+use Symfony\Component\HttpFoundation\Request;
 
 class StaticHelper
 {
@@ -41,5 +43,20 @@ class StaticHelper
         }
 
         return self::getMatomoUrl($systemConfigService) . $jsTrackingPath;
+    }
+
+    public static function buildStorefrontUrl(Request $request): string
+    {
+        $baseUrl = $request->attributes->get(RequestTransformer::SALES_CHANNEL_ABSOLUTE_BASE_URL);
+        if (!\is_string($baseUrl) || $baseUrl === '') {
+            $baseUrl = $request->getSchemeAndHttpHost();
+        }
+
+        $uri = $request->attributes->get(RequestTransformer::ORIGINAL_REQUEST_URI);
+        if (!\is_string($uri) || $uri === '') {
+            $uri = $request->getRequestUri();
+        }
+
+        return $baseUrl . $uri;
     }
 }
