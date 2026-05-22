@@ -191,6 +191,48 @@ Without this Matomo accepts the request but discards the e-commerce
 fields, leaving you with a page view but no order in the conversion
 reports.
 
+### Google Ads (GCLID) attribution
+
+The plugin forwards the **complete URL** of the storefront page,
+including any query string. So if a visitor arrives from a Google Ad
+on `https://shop.example.com/sandkasten?gclid=Cj0KCQjw…`, the GCLID is
+already in the `url` parameter Matomo receives. The plugin does **not**
+strip or rewrite tracking parameters.
+
+Matomo's free edition, however, does **not** recognize `gclid` as a
+campaign source out of the box - only `mtm_*` / `pk_*` / `utm_*` are
+parsed automatically. The GCLID will appear in the page URL but the
+conversion will not be attributed to "Google Ads / cpc" without one of
+the following:
+
+**Option 1 - register `gclid` as a campaign parameter (free, simple,
+limited).**
+In Matomo go to **Administration → Websites → Manage → (your site) →
+URL tags for campaigns** and add `gclid` to either the *Campaign name*
+or *Campaign keyword* parameter list. From the next visit on, Matomo
+will list the GCLID under **Marketing → Campaigns** - opaque token,
+no breakdown into campaign / ad group / keyword.
+
+**Option 2 - add UTM parameters via Google Ads (recommended).**
+In Google Ads, configure a **Final URL suffix** at the account, campaign
+or ad-group level with the standard UTM parameters Matomo understands
+natively, for example:
+
+```
+utm_source=google&utm_medium=cpc&utm_campaign={campaignid}&utm_content={adgroupid}&utm_term={keyword}&gclid={gclid}
+```
+
+The `{campaignid}` / `{adgroupid}` / `{keyword}` placeholders are
+Google Ads ValueTrack parameters that Google fills in at click time.
+Matomo recognizes the `utm_*` parameters automatically and breaks the
+traffic down properly under **Marketing → Campaigns**. The `gclid` is
+preserved so you can later match conversions back to clicks via the
+Google Ads API if needed.
+
+Option 2 is preferred because it gives readable campaign / ad-group
+names in Matomo's reports without any custom configuration in Matomo
+and works alongside option 1.
+
 ## Privacy and consent
 
 * `client` / `proxy` / `hybrid`: cookie consent is handled by the
